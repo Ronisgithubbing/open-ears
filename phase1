@@ -1,0 +1,35 @@
+import speech_recognition as sr
+import subprocess
+from pydub import AudioSegment
+
+def video_to_audio(video_path, audio_path):
+    # Use ffmpeg to extract audio from video
+    subprocess.call(['ffmpeg', '-i', video_path, audio_path])
+
+def transcribe_audio(audio_path):
+    # Initialize the recognizer
+    r = sr.Recognizer()
+    
+    # Load the audio file
+    with sr.AudioFile(audio_path) as source:
+        audio = r.record(source)
+    
+    # Perform the transcription
+    try:
+        text = r.recognize_google(audio)
+        return text
+    except sr.UnknownValueError:
+        return "Google Speech Recognition could not understand the audio"
+    except sr.RequestError as e:
+        return f"Could not request results from Google Speech Recognition service; {e}"
+
+def main():
+    video_path = 'path_to_your_video_file'
+    audio_path = 'path_to_save_audio_file.wav'
+    
+    video_to_audio(video_path, audio_path)
+    transcript = transcribe_audio(audio_path)
+    print(transcript)
+
+if __name__ == "__main__":
+    main()
